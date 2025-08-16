@@ -1,0 +1,215 @@
+# NeonQuest Environment Configuration Template
+# This template provides a comprehensive guide for creating custom environment configurations
+# Copy this file and modify the values to create your own cyberpunk scenarios
+
+# =============================================================================
+# CORRIDOR GENERATION SETTINGS
+# Controls how the procedural layout system generates and manages corridor segments
+# =============================================================================
+corridors:
+  # Distance ahead of player where new corridor segments are generated (in Unity units)
+  # Higher values = more pre-generated content, lower values = more responsive generation
+  generation_distance: 50.0
+  
+  # Distance behind player where old segments are cleaned up to save memory
+  # Should be significantly larger than generation_distance to avoid pop-in
+  cleanup_distance: 100.0
+  
+  # Factors that influence procedural variation in generated segments
+  # Available options: player_speed, time_of_day, zone_type, movement_pattern, game_time
+  variation_seed_factors: [player_speed, time_of_day, zone_type]
+
+# =============================================================================
+# LIGHTING SYSTEM CONFIGURATION
+# Controls dynamic lighting responses and neon sign behaviors
+# =============================================================================
+lighting:
+  # Distance at which neon signs and lights respond to player presence
+  neon_response_distance: 5.0
+  
+  # Range of brightness multipliers for reactive lighting [min, max]
+  # Values below 1.0 dim lights, above 1.0 brighten them
+  brightness_multiplier_range: [0.5, 2.0]
+  
+  # Duration in seconds for smooth lighting transitions
+  transition_duration: 2.0
+  
+  # Optional: Additional lighting parameters
+  # flicker_intensity: 0.0-1.0 (amount of random flickering)
+  # color_cycling: true/false (enable color changes)
+  # beat_sync: true/false (sync with audio beats)
+  # strobe_intensity: 0.0-1.0 (strobe light effects)
+
+# =============================================================================
+# ATMOSPHERIC EFFECTS CONFIGURATION
+# Controls fog, particle effects, and environmental atmosphere
+# =============================================================================
+atmosphere:
+  # Range of fog density values [min, max] where 0.0 = no fog, 1.0 = maximum fog
+  fog_density_range: [0.1, 0.8]
+  
+  # Range of ambient audio volume [min, max] for atmospheric sounds
+  ambient_volume_range: [0.3, 0.9]
+  
+  # Speed of atmospheric transitions (lower = slower, smoother changes)
+  transition_speed: 0.1
+  
+  # Optional: Additional atmospheric parameters
+  # particle_density: 0.0-2.0 (amount of floating particles)
+  # steam_effects: true/false (enable steam/smoke effects)
+  # haze_effects: true/false (enable light haze)
+  # laser_effects: true/false (enable laser light effects)
+
+# =============================================================================
+# AUDIO SYSTEM CONFIGURATION
+# Controls spatial audio, zone transitions, and sound management
+# =============================================================================
+audio:
+  # Distance for smooth transitions between audio zones
+  zone_transition_distance: 10.0
+  
+  # Duration in seconds for audio crossfades
+  transition_duration: 3.0
+  
+  # Maximum range for spatial audio effects
+  spatial_audio_range: 20.0
+  
+  # Maximum number of simultaneous audio sources (performance setting)
+  max_audio_sources: 20
+  
+  # Distance beyond which audio sources are culled for performance
+  culling_distance: 50.0
+  
+  # Optional: Additional audio parameters
+  # echo_intensity: 0.0-2.0 (amount of echo/reverb)
+  # bass_boost: 0.0-2.0 (low frequency emphasis)
+  # music_volume: 0.0-1.0 (background music level)
+
+# =============================================================================
+# PERFORMANCE SETTINGS
+# Controls system performance and optimization parameters
+# =============================================================================
+performance:
+  # Maximum number of active corridor segments to maintain
+  max_active_segments: 10
+  
+  # Target framerate threshold - system reduces complexity if FPS drops below this
+  throttle_threshold: 60.0
+  
+  # Optional: Additional performance parameters
+  # particle_budget: 50-200 (maximum particle count)
+  # lighting_update_rate: 15-60 (lighting calculations per second)
+  # shadow_quality: low/medium/high
+  # reflection_quality: low/medium/high
+
+# =============================================================================
+# GENERATION RULES
+# Define conditional behaviors that trigger environmental changes
+# Rules are evaluated in priority order (higher priority = evaluated first)
+# =============================================================================
+rules:
+  # Example Rule: Fast Movement Response
+  - name: FastMovementRule
+    priority: 2.0          # Higher priority rules are evaluated first
+    cooldown: 5.0          # Minimum seconds between rule activations
+    
+    # Conditions that must ALL be true for the rule to activate
+    conditions:
+      - type: PlayerSpeed           # Available types: PlayerSpeed, GameTime, ZoneType, DwellTime, MovementPattern
+        operator: GreaterThan       # Available operators: GreaterThan, LessThan, Equals, NotEquals, GreaterThanOrEqual, LessThanOrEqual
+        value: 8.0                  # Comparison value (type depends on condition type)
+    
+    # Actions to execute when conditions are met
+    actions:
+      - action: GenerateLayout      # Available actions: GenerateLayout, AdjustLighting, ChangeFogDensity, ModifyAudio, TransitionAudioZone, TriggerEffect, CreateSpatialAudio
+        target: corridor            # Target system or object for the action
+        parameters:                 # Optional parameters specific to the action
+          intensity: 1.5            # Most actions support intensity (0.0-2.0+)
+          
+      - action: AdjustLighting
+        target: neon_signs
+        parameters:
+          intensity: 1.2
+          duration: 3.0
+
+  # Example Rule: Exploration Reward
+  - name: ExplorationRewardRule
+    priority: 1.5
+    cooldown: 15.0
+    conditions:
+      - type: DwellTime
+        operator: GreaterThan
+        value: 20.0
+      - type: MovementPattern
+        operator: Equals
+        value: thorough_exploration
+    actions:
+      - action: TriggerEffect
+        target: discovery_ambience
+        parameters:
+          intensity: 1.0
+      - action: ChangeFogDensity
+        target: ambient
+        parameters:
+          intensity: 0.7
+
+  # Example Rule: Zone-Based Audio
+  - name: ZoneTransitionRule
+    priority: 2.5
+    cooldown: 2.0
+    conditions:
+      - type: ZoneType
+        operator: Equals
+        value: industrial_area
+    actions:
+      - action: TransitionAudioZone
+        target: industrial_ambience
+        parameters:
+          intensity: 1.0
+          fade_duration: 4.0
+      - action: CreateSpatialAudio
+        target: machinery_hum
+        parameters:
+          intensity: 0.8
+          range: 15.0
+
+# =============================================================================
+# CONDITION TYPES REFERENCE
+# =============================================================================
+# PlayerSpeed: Current player movement speed (float)
+# GameTime: Time elapsed since game start in seconds (float)
+# ZoneType: Current zone identifier (string)
+# DwellTime: Time spent in current location in seconds (float)
+# MovementPattern: Detected movement behavior (string)
+#   - Values: exploration, backtracking, cautious_exploration, thorough_exploration, social_interaction
+
+# =============================================================================
+# ACTION TYPES REFERENCE
+# =============================================================================
+# GenerateLayout: Create new corridor segments or rooms
+#   - target: corridor, room, junction, hidden_alcove
+#   - parameters: intensity, complexity
+#
+# AdjustLighting: Modify lighting brightness, color, or effects
+#   - target: neon_signs, ceiling_panels, ambient_glow, all_lights
+#   - parameters: intensity, duration, color_temperature, flicker_rate
+#
+# ChangeFogDensity: Adjust atmospheric fog density
+#   - target: ambient, localized, tunnel_mist
+#   - parameters: intensity, transition_speed
+#
+# ModifyAudio: Change audio properties
+#   - target: ambient_drone, machinery_hum, crowd_chatter
+#   - parameters: intensity, volume, pitch, filter
+#
+# TransitionAudioZone: Switch between audio environments
+#   - target: zone_name
+#   - parameters: intensity, fade_duration
+#
+# TriggerEffect: Activate special effects
+#   - target: steam_burst, electrical_surge, discovery_ambience
+#   - parameters: intensity, duration
+#
+# CreateSpatialAudio: Generate positioned audio sources
+#   - target: footstep_echo, machinery_hum, water_drips
+#   - parameters: intensity, range, randomization

@@ -1,0 +1,17 @@
+{
+    "name": "NeonQuest.PlayerBehavior",
+    "rootNamespace": "NeonQuest.PlayerBehavior",
+    "references": [
+        "NeonQuest.Core",
+        "NeonQuest.Configuration"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

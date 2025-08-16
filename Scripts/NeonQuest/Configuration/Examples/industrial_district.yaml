@@ -1,0 +1,120 @@
+# Industrial District Configuration
+# Heavy machinery ambience, harsh lighting, dense fog
+# Optimized for exploration-heavy gameplay with mechanical atmosphere
+
+# Corridor generation settings - wider spaces for industrial feel
+corridors:
+  generation_distance: 60.0
+  cleanup_distance: 120.0
+  variation_seed_factors: [player_speed, machinery_noise, industrial_density]
+
+# Harsh industrial lighting with flickering effects
+lighting:
+  neon_response_distance: 8.0
+  brightness_multiplier_range: [0.3, 1.8]
+  transition_duration: 1.5
+  flicker_intensity: 0.4
+  industrial_color_temperature: 4200
+
+# Dense atmospheric effects for industrial ambience
+atmosphere:
+  fog_density_range: [0.3, 0.9]
+  ambient_volume_range: [0.5, 1.0]
+  transition_speed: 0.05
+  particle_density: 1.2
+  steam_effects: true
+
+# Audio system with heavy machinery focus
+audio:
+  zone_transition_distance: 15.0
+  transition_duration: 4.0
+  spatial_audio_range: 25.0
+  max_audio_sources: 25
+  culling_distance: 60.0
+  machinery_volume: 0.8
+  echo_intensity: 0.6
+
+# Performance settings for complex industrial scenes
+performance:
+  max_active_segments: 8
+  throttle_threshold: 55.0
+  particle_budget: 150
+
+# Industrial-specific generation rules
+rules:
+  - name: MachineryProximityRule
+    priority: 3.0
+    cooldown: 8.0
+    conditions:
+      - type: PlayerSpeed
+        operator: LessThan
+        value: 3.0
+      - type: DwellTime
+        operator: GreaterThan
+        value: 15.0
+    actions:
+      - action: CreateSpatialAudio
+        target: machinery_hum
+        parameters:
+          intensity: 1.2
+          range: 20.0
+      - action: TriggerEffect
+        target: steam_burst
+        parameters:
+          intensity: 0.8
+
+  - name: IndustrialLightingRule
+    priority: 2.5
+    cooldown: 6.0
+    conditions:
+      - type: PlayerSpeed
+        operator: GreaterThan
+        value: 6.0
+    actions:
+      - action: AdjustLighting
+        target: overhead_industrial
+        parameters:
+          intensity: 1.4
+          flicker_rate: 2.0
+      - action: ChangeFogDensity
+        target: ambient
+        parameters:
+          intensity: 1.1
+
+  - name: HeavyMachineryRule
+    priority: 2.8
+    cooldown: 12.0
+    conditions:
+      - type: ZoneType
+        operator: Equals
+        value: heavy_machinery
+    actions:
+      - action: ModifyAudio
+        target: machinery_drone
+        parameters:
+          intensity: 1.5
+          low_frequency_boost: 1.3
+      - action: TriggerEffect
+        target: vibration_effect
+        parameters:
+          intensity: 0.6
+
+  - name: ExplorationRewardRule
+    priority: 1.8
+    cooldown: 20.0
+    conditions:
+      - type: MovementPattern
+        operator: Equals
+        value: thorough_exploration
+      - type: GameTime
+        operator: GreaterThan
+        value: 180.0
+    actions:
+      - action: GenerateLayout
+        target: hidden_alcove
+        parameters:
+          complexity: 1.2
+      - action: CreateSpatialAudio
+        target: discovery_ambience
+        parameters:
+          intensity: 0.9

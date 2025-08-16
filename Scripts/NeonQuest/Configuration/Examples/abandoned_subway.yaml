@@ -1,0 +1,156 @@
+# Abandoned Subway Configuration
+# Eerie atmosphere, flickering emergency lighting, echoing sounds
+# Optimized for tension and exploration with minimal lighting
+
+# Corridor generation settings - long tunnels with occasional platforms
+corridors:
+  generation_distance: 80.0
+  cleanup_distance: 160.0
+  variation_seed_factors: [player_speed, echo_intensity, darkness_level]
+
+# Minimal emergency lighting with frequent flickering
+lighting:
+  neon_response_distance: 12.0
+  brightness_multiplier_range: [0.1, 1.2]
+  transition_duration: 3.0
+  emergency_lighting: true
+  flicker_frequency: 0.3
+  power_surge_chance: 0.15
+
+# Heavy fog and dust particles for abandoned feel
+atmosphere:
+  fog_density_range: [0.4, 0.95]
+  ambient_volume_range: [0.2, 0.8]
+  transition_speed: 0.03
+  dust_particles: true
+  water_drips: true
+
+# Audio system emphasizing echoes and ambient sounds
+audio:
+  zone_transition_distance: 20.0
+  transition_duration: 5.0
+  spatial_audio_range: 35.0
+  max_audio_sources: 15
+  culling_distance: 80.0
+  echo_intensity: 1.8
+  reverb_decay: 4.0
+  ambient_silence: 0.3
+
+# Performance settings for atmospheric effects
+performance:
+  max_active_segments: 6
+  throttle_threshold: 50.0
+  particle_budget: 80
+  shadow_quality: high
+
+# Abandoned subway-specific generation rules
+rules:
+  - name: EmergencyLightingRule
+    priority: 2.5
+    cooldown: 15.0
+    conditions:
+      - type: PlayerSpeed
+        operator: LessThan
+        value: 1.5
+      - type: DwellTime
+        operator: GreaterThan
+        value: 20.0
+    actions:
+      - action: AdjustLighting
+        target: emergency_strips
+        parameters:
+          intensity: 0.8
+          flicker_rate: 0.5
+          red_tint: 1.4
+      - action: CreateSpatialAudio
+        target: electrical_hum
+        parameters:
+          intensity: 0.4
+          frequency_variation: 0.6
+
+  - name: FootstepEchoRule
+    priority: 3.0
+    cooldown: 1.0
+    conditions:
+      - type: PlayerSpeed
+        operator: GreaterThan
+        value: 2.0
+    actions:
+      - action: CreateSpatialAudio
+        target: footstep_echo
+        parameters:
+          intensity: 0.7
+          echo_delay: 1.2
+          decay_rate: 0.8
+      - action: TriggerEffect
+        target: dust_disturbance
+        parameters:
+          intensity: 0.5
+
+  - name: WaterDripRule
+    priority: 1.5
+    cooldown: 25.0
+    conditions:
+      - type: ZoneType
+        operator: Equals
+        value: tunnel_section
+      - type: GameTime
+        operator: GreaterThan
+        value: 60.0
+    actions:
+      - action: CreateSpatialAudio
+        target: water_drips
+        parameters:
+          intensity: 0.6
+          randomization: 1.0
+          spatial_spread: 0.8
+      - action: TriggerEffect
+        target: puddle_ripples
+        parameters:
+          intensity: 0.3
+
+  - name: PowerSurgeRule
+    priority: 2.8
+    cooldown: 45.0
+    conditions:
+      - type: MovementPattern
+        operator: Equals
+        value: cautious_exploration
+    actions:
+      - action: AdjustLighting
+        target: all_emergency
+        parameters:
+          surge_intensity: 2.0
+          surge_duration: 0.8
+          flicker_aftermath: 3.0
+      - action: CreateSpatialAudio
+        target: electrical_surge
+        parameters:
+          intensity: 1.0
+          frequency_spike: 1.5
+
+  - name: DeepTunnelRule
+    priority: 2.0
+    cooldown: 30.0
+    conditions:
+      - type: ZoneType
+        operator: Equals
+        value: deep_tunnel
+      - type: PlayerSpeed
+        operator: LessThan
+        value: 3.0
+    actions:
+      - action: ChangeFogDensity
+        target: tunnel_mist
+        parameters:
+          intensity: 1.3
+      - action: ModifyAudio
+        target: distant_rumble
+        parameters:
+          intensity: 0.8
+          low_frequency_emphasis: 1.4
+      - action: AdjustLighting
+        target: distant_glow
+        parameters:
+          intensity: 0.4
+          warm_color: 0.6

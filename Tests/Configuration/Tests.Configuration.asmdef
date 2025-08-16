@@ -1,0 +1,22 @@
+{
+    "name": "Tests.Configuration",
+    "rootNamespace": "NeonQuest.Tests.Configuration",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "NeonQuest.Configuration"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

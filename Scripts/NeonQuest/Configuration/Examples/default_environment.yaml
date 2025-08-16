@@ -1,0 +1,74 @@
+# NeonQuest Environment Configuration
+# This file defines the rules and parameters for dynamic environment generation
+
+# Corridor generation settings
+corridors:
+  generation_distance: 50.0
+  cleanup_distance: 100.0
+  variation_seed_factors: [player_speed, time_of_day, zone_type]
+
+# Lighting system configuration
+lighting:
+  neon_response_distance: 5.0
+  brightness_multiplier_range: [0.5, 2.0]
+  transition_duration: 2.0
+
+# Atmospheric effects configuration
+atmosphere:
+  fog_density_range: [0.1, 0.8]
+  ambient_volume_range: [0.3, 0.9]
+  transition_speed: 0.1
+
+# Audio system configuration
+audio:
+  zone_transition_distance: 10.0
+  transition_duration: 3.0
+  spatial_audio_range: 20.0
+  max_audio_sources: 20
+  culling_distance: 50.0
+
+# Performance settings
+performance:
+  max_active_segments: 10
+  throttle_threshold: 60.0
+
+# Generation rules
+rules:
+  - name: FastMovementRule
+    priority: 2.0
+    cooldown: 5.0
+    conditions:
+      - type: PlayerSpeed operator: GreaterThan value: 8.0
+    actions:
+      - action: GenerateLayout target: corridor intensity: 1.5
+      - action: AdjustLighting target: neon_signs intensity: 1.2
+
+  - name: SlowExplorationRule
+    priority: 1.0
+    cooldown: 3.0
+    conditions:
+      - type: PlayerSpeed operator: LessThan value: 2.0
+      - type: DwellTime operator: GreaterThan value: 10.0
+    actions:
+      - action: ChangeFogDensity target: ambient intensity: 0.8
+      - action: ModifyAudio target: ambient_drone intensity: 0.6
+      - action: TransitionAudioZone target: quiet_zone intensity: 1.0
+
+  - name: TimeBasedAtmosphereRule
+    priority: 1.5
+    cooldown: 30.0
+    conditions:
+      - type: GameTime operator: GreaterThan value: 300.0
+    actions:
+      - action: ChangeFogDensity target: global intensity: 1.3
+      - action: TriggerEffect target: atmospheric_shift intensity: 1.0
+      - action: CreateSpatialAudio target: ambient_machinery intensity: 0.7
+
+  - name: ZoneTransitionRule
+    priority: 2.5
+    cooldown: 2.0
+    conditions:
+      - type: ZoneChange operator: Equals value: true
+    actions:
+      - action: TransitionAudioZone target: current_zone intensity: 1.0
+      - action: ModifyAudio target: ambient_volume intensity: 0.8

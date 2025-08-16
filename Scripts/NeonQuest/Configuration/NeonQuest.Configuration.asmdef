@@ -1,0 +1,16 @@
+{
+    "name": "NeonQuest.Configuration",
+    "rootNamespace": "NeonQuest.Configuration",
+    "references": [
+        "NeonQuest.Core"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

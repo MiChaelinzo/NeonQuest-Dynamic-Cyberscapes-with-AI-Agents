@@ -1,0 +1,26 @@
+{
+    "name": "Tests.Generation",
+    "rootNamespace": "NeonQuest.Tests.Generation",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "NeonQuest.Generation",
+        "NeonQuest.Configuration",
+        "NeonQuest.Core",
+        "NeonQuest.Assets",
+        "NeonQuest.PlayerBehavior"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

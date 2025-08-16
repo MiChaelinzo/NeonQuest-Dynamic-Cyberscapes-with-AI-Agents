@@ -1,0 +1,19 @@
+{
+    "name": "NeonQuest.Generation",
+    "rootNamespace": "NeonQuest.Generation",
+    "references": [
+        "NeonQuest.Core",
+        "NeonQuest.Configuration",
+        "NeonQuest.Assets",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
