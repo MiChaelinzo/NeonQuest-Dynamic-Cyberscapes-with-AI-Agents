@@ -1,11 +1,11 @@
-# 🌆 NeonQuest: Dynamic Cyberscapes
+# 🚇 NeonQuest — Dynamic Cyberscapes with Kiro AI Agents
 
 [![Unity Version](https://img.shields.io/badge/Unity-2022.3%2B-blue.svg)](https://unity3d.com/get-unity/download)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-100%2B-brightgreen.svg)](#testing)
 [![Code Coverage](https://img.shields.io/badge/Coverage-95%25-brightgreen.svg)](#testing)
 
-> **An intelligent procedural environment generation system that creates dynamic cyberpunk landscapes responding to player behavior while preserving the artistic integrity of the Neon Underground asset pack.**
+**Fuse Daelonik's *Neon Underground* with Kiro's AI agent hooks to procedurally generate dynamic layouts, lighting, and ambient effects — delivering an immersive cyberpunk environment that adapts in real time, ensuring every run feels uniquely alive.**
 
 ## 🎯 Overview
 
@@ -13,12 +13,22 @@ NeonQuest transforms static cyberpunk environments into living, breathing worlds
 
 ### ✨ Key Features
 
+#### 🚀 Next-Gen AI Systems
 - 🧠 **AI-Driven Adaptation** - Kiro agent integration for intelligent environment responses
+- 🌦️ **AI-Powered Weather System** - Machine learning-driven atmospheric conditions that adapt to gameplay
+- 🤖 **Neural NPC Behavior** - Advanced AI characters with emergent behavioral patterns
+- 📊 **Biometric Response System** - Real-time player stress and engagement monitoring
+
+#### 🎨 Immersive Visual Experience
 - 🎨 **Asset Preservation** - Maintains Neon Underground's artistic integrity
-- ⚡ **Real-Time Generation** - Dynamic corridor and room creation
+- ⚡ **Quantum Lighting Engine** - Advanced photon simulation with particle-based illumination
 - 🌈 **Responsive Lighting** - Neon signs react to player proximity and movement
+- 🌫️ **Atmospheric Effects** - Dynamic fog and particle systems with weather integration
+- 🔮 **Holographic UI Overlays** - Cyberpunk-style AR interfaces with neural link indicators
+
+#### 🎮 Dynamic Gameplay Systems
+- ⚡ **Real-Time Generation** - Dynamic corridor and room creation
 - 🎵 **Adaptive Audio** - Zone-based ambient soundscapes with smooth transitions
-- 🌫️ **Atmospheric Effects** - Dynamic fog and particle systems
 - 🛠️ **Developer Tools** - Comprehensive Unity Editor integration
 - 📊 **Performance Optimized** - Automatic throttling and memory management
 
