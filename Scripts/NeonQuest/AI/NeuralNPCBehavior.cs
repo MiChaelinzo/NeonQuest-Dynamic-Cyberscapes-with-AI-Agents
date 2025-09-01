@@ -14,12 +14,16 @@ namespace NeonQuest.AI
     /// </summary>
     public class NeuralNPCBehavior : NeonQuestComponent
     {
-        [Header("Neural Network Configuration")]
+        [Header("🧠 Neural Network Configuration")]
         [SerializeField] private int neuralNetworkLayers = 3;
         [SerializeField] private int neuronsPerLayer = 16;
         [SerializeField] private float learningRate = 0.01f;
         [SerializeField] private float adaptationSpeed = 0.5f;
         [SerializeField] private bool enableRealTimeLearning = true;
+        [SerializeField] private bool enableEmotionalIntelligence = true;
+        [SerializeField] private bool enableSwarmIntelligence = true;
+        [SerializeField] private bool enableQuantumDecisionMaking = false;
+        [SerializeField] private bool enablePredictiveAnalytics = true;
 
         [Header("NPC Behavior Settings")]
         [SerializeField] private float interactionRadius = 5f;
@@ -38,18 +42,30 @@ namespace NeonQuest.AI
         private NPCNeuralNetwork neuralNetwork;
         private BehaviorMemorySystem memorySystem;
         private PlayerInteractionAnalyzer interactionAnalyzer;
+        private EmotionalIntelligenceEngine emotionalEngine;
+        private SwarmIntelligenceCore swarmCore;
+        private QuantumDecisionProcessor quantumProcessor;
+        private PredictiveAnalyticsEngine predictiveEngine;
         
         // NPC State Management
         private NPCState currentState;
         private NPCPersonality personality;
         private Queue<PlayerInteraction> interactionHistory;
         private Dictionary<string, float> behaviorWeights;
+        private EmotionalState currentEmotionalState;
+        private Dictionary<string, float> emotionalMemory;
+        private List<NPCNeuralBehavior> nearbyNPCs;
+        private SwarmBehaviorData swarmData;
         
         // Learning and Adaptation
         private Coroutine learningCoroutine;
+        private Coroutine emotionalUpdateCoroutine;
+        private Coroutine swarmUpdateCoroutine;
         private float lastLearningUpdate;
         private Vector3 lastPlayerPosition;
         private float playerProximityTime;
+        private float emotionalIntensity = 0.5f;
+        private float swarmInfluence = 0.3f;
 
         public enum NPCState
         {
@@ -61,7 +77,27 @@ namespace NeonQuest.AI
             Avoiding,
             Socializing,
             Working,
-            Guarding
+            Guarding,
+            EmotionalResponse,
+            SwarmBehavior,
+            QuantumDecision,
+            PredictiveAction
+        }
+        
+        public enum EmotionalState
+        {
+            Neutral,
+            Happy,
+            Sad,
+            Angry,
+            Fearful,
+            Surprised,
+            Disgusted,
+            Excited,
+            Anxious,
+            Confident,
+            Empathetic,
+            Nostalgic
         }
 
         public enum NPCPersonalityType
@@ -103,6 +139,31 @@ namespace NeonQuest.AI
             public float timestamp;
             public float playerStressLevel;
             public float playerEngagement;
+            public EmotionalState detectedPlayerEmotion;
+            public float emotionalResonance;
+        }
+        
+        [System.Serializable]
+        public class EmotionalResponse
+        {
+            public EmotionalState emotion;
+            public float intensity;
+            public float duration;
+            public string trigger;
+            public Vector3 triggerLocation;
+            public float timestamp;
+        }
+        
+        [System.Serializable]
+        public class SwarmBehaviorData
+        {
+            public Vector3 swarmCenter;
+            public float swarmRadius;
+            public int swarmSize;
+            public NPCState dominantBehavior;
+            public float cohesionStrength;
+            public float separationStrength;
+            public float alignmentStrength;
         }
 
         [System.Serializable]
@@ -126,6 +187,31 @@ namespace NeonQuest.AI
                 neuralNetwork = new NPCNeuralNetwork(neuronsPerLayer, neuralNetworkLayers, learningRate);
                 memorySystem = new BehaviorMemorySystem(maxMemorySize);
                 interactionAnalyzer = new PlayerInteractionAnalyzer();
+                
+                // Initialize advanced AI systems
+                if (enableEmotionalIntelligence)
+                {
+                    emotionalEngine = new EmotionalIntelligenceEngine();
+                    currentEmotionalState = EmotionalState.Neutral;
+                    emotionalMemory = new Dictionary<string, float>();
+                }
+                
+                if (enableSwarmIntelligence)
+                {
+                    swarmCore = new SwarmIntelligenceCore();
+                    nearbyNPCs = new List<NPCNeuralBehavior>();
+                    swarmData = new SwarmBehaviorData();
+                }
+                
+                if (enableQuantumDecisionMaking)
+                {
+                    quantumProcessor = new QuantumDecisionProcessor();
+                }
+                
+                if (enablePredictiveAnalytics)
+                {
+                    predictiveEngine = new PredictiveAnalyticsEngine();
+                }
 
                 // Initialize NPC components
                 InitializeNPCComponents();
@@ -147,6 +233,18 @@ namespace NeonQuest.AI
                 if (enableRealTimeLearning)
                 {
                     learningCoroutine = StartCoroutine(LearningUpdateLoop());
+                }
+                
+                // Start emotional intelligence updates
+                if (enableEmotionalIntelligence)
+                {
+                    emotionalUpdateCoroutine = StartCoroutine(EmotionalUpdateLoop());
+                }
+                
+                // Start swarm intelligence updates
+                if (enableSwarmIntelligence)
+                {
+                    swarmUpdateCoroutine = StartCoroutine(SwarmUpdateLoop());
                 }
 
                 LogDebug($"Neural NPC initialized with {personality.type} personality");
@@ -277,6 +375,18 @@ namespace NeonQuest.AI
 
                     // Update NPC state and actions
                     UpdateNPCBehavior();
+                    
+                    // Process quantum decisions if enabled
+                    if (enableQuantumDecisionMaking && quantumProcessor != null)
+                    {
+                        ProcessQuantumDecisions();
+                    }
+                    
+                    // Update predictive analytics
+                    if (enablePredictiveAnalytics && predictiveEngine != null)
+                    {
+                        UpdatePredictiveAnalytics();
+                    }
 
                     lastLearningUpdate = Time.time;
                 }
@@ -711,6 +821,510 @@ namespace NeonQuest.AI
                 TransitionToState(NPCState.Patrolling);
             }
         }
+        
+        #region Emotional Intelligence System
+        
+        private IEnumerator EmotionalUpdateLoop()
+        {
+            while (isInitialized && enableEmotionalIntelligence)
+            {
+                yield return new WaitForSeconds(0.5f); // Update twice per second
+                
+                try
+                {
+                    // Analyze emotional context
+                    AnalyzeEmotionalContext();
+                    
+                    // Update emotional state
+                    UpdateEmotionalState();
+                    
+                    // Apply emotional influence to behavior
+                    ApplyEmotionalInfluence();
+                    
+                    // Update emotional memory
+                    UpdateEmotionalMemory();
+                }
+                catch (System.Exception ex)
+                {
+                    LogError($"Error in emotional intelligence update: {ex.Message}");
+                }
+            }
+        }
+        
+        private void AnalyzeEmotionalContext()
+        {
+            var playerTracker = FindObjectOfType<PlayerMovementTracker>();
+            if (playerTracker == null) return;
+            
+            // Analyze player's emotional state based on behavior
+            EmotionalState detectedPlayerEmotion = emotionalEngine.AnalyzePlayerEmotion(playerTracker);
+            
+            // Calculate emotional resonance
+            float resonance = emotionalEngine.CalculateEmotionalResonance(currentEmotionalState, detectedPlayerEmotion, personality);
+            
+            // Store emotional context
+            if (interactionHistory.Count > 0)
+            {
+                var lastInteraction = interactionHistory.Last();
+                lastInteraction.detectedPlayerEmotion = detectedPlayerEmotion;
+                lastInteraction.emotionalResonance = resonance;
+            }
+        }
+        
+        private void UpdateEmotionalState()
+        {
+            // Get emotional triggers from environment
+            var triggers = emotionalEngine.DetectEmotionalTriggers(transform.position, interactionHistory.ToArray());
+            
+            foreach (var trigger in triggers)
+            {
+                ProcessEmotionalTrigger(trigger);
+            }
+            
+            // Natural emotional decay towards neutral
+            emotionalIntensity = Mathf.Lerp(emotionalIntensity, 0.5f, Time.deltaTime * 0.1f);
+            
+            // Update emotional state based on intensity and personality
+            currentEmotionalState = emotionalEngine.DetermineEmotionalState(emotionalIntensity, personality, currentEmotionalState);
+        }
+        
+        private void ProcessEmotionalTrigger(EmotionalTrigger trigger)
+        {
+            // Apply emotional response based on personality
+            float emotionalImpact = trigger.intensity * personality.adaptability;
+            
+            switch (trigger.type)
+            {
+                case EmotionalTriggerType.PlayerApproach:
+                    if (personality.friendliness > 0.6f)
+                        emotionalIntensity += emotionalImpact * 0.3f;
+                    else if (personality.aggression > 0.6f)
+                        emotionalIntensity += emotionalImpact * 0.5f;
+                    break;
+                    
+                case EmotionalTriggerType.PlayerFlee:
+                    if (personality.curiosity > 0.7f)
+                        emotionalIntensity += emotionalImpact * 0.4f;
+                    break;
+                    
+                case EmotionalTriggerType.LongInteraction:
+                    if (personality.socialness > 0.5f)
+                        emotionalIntensity += emotionalImpact * 0.6f;
+                    break;
+            }
+            
+            emotionalIntensity = Mathf.Clamp01(emotionalIntensity);
+        }
+        
+        private void ApplyEmotionalInfluence()
+        {
+            // Modify behavior weights based on emotional state
+            float emotionalModifier = GetEmotionalBehaviorModifier();
+            
+            switch (currentEmotionalState)
+            {
+                case EmotionalState.Happy:
+                    behaviorWeights["interact"] *= 1.3f;
+                    behaviorWeights["socialize"] *= 1.4f;
+                    behaviorWeights["avoid"] *= 0.7f;
+                    break;
+                    
+                case EmotionalState.Fearful:
+                    behaviorWeights["avoid"] *= 1.5f;
+                    behaviorWeights["interact"] *= 0.6f;
+                    behaviorWeights["guard"] *= 1.2f;
+                    break;
+                    
+                case EmotionalState.Curious:
+                    behaviorWeights["investigate"] *= 1.4f;
+                    behaviorWeights["follow"] *= 1.2f;
+                    behaviorWeights["patrol"] *= 0.8f;
+                    break;
+                    
+                case EmotionalState.Angry:
+                    behaviorWeights["avoid"] *= 1.3f;
+                    behaviorWeights["guard"] *= 1.4f;
+                    behaviorWeights["socialize"] *= 0.5f;
+                    break;
+            }
+            
+            // Normalize behavior weights
+            NormalizeBehaviorWeights();
+        }
+        
+        private float GetEmotionalBehaviorModifier()
+        {
+            return 0.5f + (emotionalIntensity * 0.5f);
+        }
+        
+        private void UpdateEmotionalMemory()
+        {
+            string emotionalKey = $"{currentEmotionalState}_{Time.time:F0}";
+            emotionalMemory[emotionalKey] = emotionalIntensity;
+            
+            // Maintain memory size
+            if (emotionalMemory.Count > 100)
+            {
+                var oldestKey = emotionalMemory.Keys.First();
+                emotionalMemory.Remove(oldestKey);
+            }
+        }
+        
+        #endregion
+        
+        #region Swarm Intelligence System
+        
+        private IEnumerator SwarmUpdateLoop()
+        {
+            while (isInitialized && enableSwarmIntelligence)
+            {
+                yield return new WaitForSeconds(1f); // Update once per second
+                
+                try
+                {
+                    // Find nearby NPCs
+                    UpdateNearbyNPCs();
+                    
+                    // Calculate swarm behavior
+                    CalculateSwarmBehavior();
+                    
+                    // Apply swarm influence
+                    ApplySwarmInfluence();
+                    
+                    // Share information with swarm
+                    ShareSwarmInformation();
+                }
+                catch (System.Exception ex)
+                {
+                    LogError($"Error in swarm intelligence update: {ex.Message}");
+                }
+            }
+        }
+        
+        private void UpdateNearbyNPCs()
+        {
+            nearbyNPCs.Clear();
+            
+            var allNPCs = FindObjectsOfType<NPCNeuralBehavior>();
+            foreach (var npc in allNPCs)
+            {
+                if (npc != this && Vector3.Distance(transform.position, npc.transform.position) <= 15f)
+                {
+                    nearbyNPCs.Add(npc);
+                }
+            }
+        }
+        
+        private void CalculateSwarmBehavior()
+        {
+            if (nearbyNPCs.Count == 0) return;
+            
+            // Calculate swarm center
+            Vector3 center = Vector3.zero;
+            foreach (var npc in nearbyNPCs)
+            {
+                center += npc.transform.position;
+            }
+            center /= nearbyNPCs.Count;
+            swarmData.swarmCenter = center;
+            
+            // Calculate swarm properties
+            swarmData.swarmSize = nearbyNPCs.Count + 1; // Include self
+            swarmData.swarmRadius = CalculateSwarmRadius();
+            swarmData.dominantBehavior = CalculateDominantBehavior();
+            
+            // Calculate swarm forces
+            swarmData.cohesionStrength = CalculateCohesion();
+            swarmData.separationStrength = CalculateSeparation();
+            swarmData.alignmentStrength = CalculateAlignment();
+        }
+        
+        private float CalculateSwarmRadius()
+        {
+            float maxDistance = 0f;
+            foreach (var npc in nearbyNPCs)
+            {
+                float distance = Vector3.Distance(swarmData.swarmCenter, npc.transform.position);
+                if (distance > maxDistance)
+                    maxDistance = distance;
+            }
+            return maxDistance;
+        }
+        
+        private NPCState CalculateDominantBehavior()
+        {
+            var behaviorCounts = new Dictionary<NPCState, int>();
+            
+            // Count current behaviors
+            behaviorCounts[currentState] = behaviorCounts.GetValueOrDefault(currentState, 0) + 1;
+            foreach (var npc in nearbyNPCs)
+            {
+                var npcState = npc.GetCurrentState();
+                behaviorCounts[npcState] = behaviorCounts.GetValueOrDefault(npcState, 0) + 1;
+            }
+            
+            // Find most common behavior
+            return behaviorCounts.OrderByDescending(kvp => kvp.Value).First().Key;
+        }
+        
+        private float CalculateCohesion()
+        {
+            // Tendency to move toward swarm center
+            float distance = Vector3.Distance(transform.position, swarmData.swarmCenter);
+            return Mathf.Clamp01(distance / 10f) * personality.socialness;
+        }
+        
+        private float CalculateSeparation()
+        {
+            // Tendency to avoid crowding
+            float crowdingFactor = 0f;
+            foreach (var npc in nearbyNPCs)
+            {
+                float distance = Vector3.Distance(transform.position, npc.transform.position);
+                if (distance < 3f)
+                {
+                    crowdingFactor += (3f - distance) / 3f;
+                }
+            }
+            return Mathf.Clamp01(crowdingFactor) * personality.independence;
+        }
+        
+        private float CalculateAlignment()
+        {
+            // Tendency to align with swarm movement
+            if (nearbyNPCs.Count == 0) return 0f;
+            
+            Vector3 averageVelocity = Vector3.zero;
+            foreach (var npc in nearbyNPCs)
+            {
+                if (npc.navAgent != null)
+                    averageVelocity += npc.navAgent.velocity;
+            }
+            averageVelocity /= nearbyNPCs.Count;
+            
+            float alignment = Vector3.Dot(navAgent.velocity.normalized, averageVelocity.normalized);
+            return Mathf.Clamp01(alignment) * personality.adaptability;
+        }
+        
+        private void ApplySwarmInfluence()
+        {
+            if (nearbyNPCs.Count == 0) return;
+            
+            // Influence behavior based on swarm
+            float swarmBehaviorInfluence = swarmInfluence * personality.socialness;
+            
+            if (swarmData.dominantBehavior != currentState && Random.value < swarmBehaviorInfluence)
+            {
+                // Consider adopting swarm behavior
+                if (ShouldAdoptSwarmBehavior(swarmData.dominantBehavior))
+                {
+                    TransitionToState(swarmData.dominantBehavior);
+                }
+            }
+            
+            // Apply swarm movement forces
+            ApplySwarmMovement();
+        }
+        
+        private bool ShouldAdoptSwarmBehavior(NPCState swarmBehavior)
+        {
+            // Don't adopt behavior if it conflicts with personality
+            switch (swarmBehavior)
+            {
+                case NPCState.Aggressive:
+                    return personality.aggression > 0.4f;
+                case NPCState.Socializing:
+                    return personality.socialness > 0.5f;
+                case NPCState.Avoiding:
+                    return personality.independence < 0.7f;
+                default:
+                    return true;
+            }
+        }
+        
+        private void ApplySwarmMovement()
+        {
+            if (currentState != NPCState.Patrolling && currentState != NPCState.Idle) return;
+            
+            Vector3 swarmForce = Vector3.zero;
+            
+            // Cohesion force
+            Vector3 cohesionForce = (swarmData.swarmCenter - transform.position).normalized * swarmData.cohesionStrength;
+            
+            // Separation force
+            Vector3 separationForce = Vector3.zero;
+            foreach (var npc in nearbyNPCs)
+            {
+                Vector3 diff = transform.position - npc.transform.position;
+                float distance = diff.magnitude;
+                if (distance < 3f && distance > 0f)
+                {
+                    separationForce += diff.normalized / distance;
+                }
+            }
+            separationForce *= swarmData.separationStrength;
+            
+            // Combine forces
+            swarmForce = cohesionForce + separationForce;
+            swarmForce.y = 0; // Keep on ground plane
+            
+            // Apply to movement
+            if (swarmForce.magnitude > 0.1f)
+            {
+                Vector3 targetPosition = transform.position + swarmForce.normalized * 5f;
+                navAgent.SetDestination(targetPosition);
+            }
+        }
+        
+        private void ShareSwarmInformation()
+        {
+            // Share emotional state and behavior patterns with nearby NPCs
+            var sharedInfo = new SwarmInformation
+            {
+                sourceNPC = this,
+                emotionalState = currentEmotionalState,
+                behaviorWeights = new Dictionary<string, float>(behaviorWeights),
+                playerInteractionQuality = CalculatePlayerInteractionQuality(),
+                timestamp = Time.time
+            };
+            
+            foreach (var npc in nearbyNPCs)
+            {
+                npc.ReceiveSwarmInformation(sharedInfo);
+            }
+        }
+        
+        private float CalculatePlayerInteractionQuality()
+        {
+            if (interactionHistory.Count == 0) return 0.5f;
+            
+            var recentInteractions = interactionHistory.TakeLast(5);
+            float totalQuality = 0f;
+            
+            foreach (var interaction in recentInteractions)
+            {
+                float quality = (interaction.playerEngagement + interaction.emotionalResonance) * 0.5f;
+                totalQuality += quality;
+            }
+            
+            return totalQuality / recentInteractions.Count();
+        }
+        
+        public void ReceiveSwarmInformation(SwarmInformation info)
+        {
+            if (!enableSwarmIntelligence) return;
+            
+            // Learn from other NPCs' experiences
+            float influenceStrength = 0.1f * personality.adaptability;
+            
+            // Adjust behavior weights based on successful patterns
+            if (info.playerInteractionQuality > 0.7f)
+            {
+                foreach (var weight in info.behaviorWeights)
+                {
+                    if (behaviorWeights.ContainsKey(weight.Key))
+                    {
+                        behaviorWeights[weight.Key] = Mathf.Lerp(behaviorWeights[weight.Key], weight.Value, influenceStrength);
+                    }
+                }
+            }
+            
+            // Emotional contagion
+            if (info.emotionalState != EmotionalState.Neutral && personality.socialness > 0.6f)
+            {
+                float emotionalInfluence = influenceStrength * 0.5f;
+                emotionalIntensity = Mathf.Lerp(emotionalIntensity, 0.7f, emotionalInfluence);
+            }
+        }
+        
+        #endregion
+        
+        #region Quantum Decision Making
+        
+        private void ProcessQuantumDecisions()
+        {
+            if (quantumProcessor == null) return;
+            
+            // Create quantum superposition of possible decisions
+            var possibleStates = System.Enum.GetValues(typeof(NPCState)).Cast<NPCState>().ToArray();
+            var quantumStates = quantumProcessor.CreateDecisionSuperposition(possibleStates, behaviorWeights);
+            
+            // Process quantum decision
+            var quantumDecision = quantumProcessor.CollapseToOptimalDecision(quantumStates, personality, currentEmotionalState);
+            
+            if (quantumDecision != null && quantumDecision.confidence > 0.8f)
+            {
+                // Apply quantum decision with high confidence
+                if (quantumDecision.recommendedState != currentState)
+                {
+                    LogDebug($"Quantum decision: {currentState} -> {quantumDecision.recommendedState} (confidence: {quantumDecision.confidence:F2})");
+                    TransitionToState(quantumDecision.recommendedState);
+                }
+            }
+        }
+        
+        #endregion
+        
+        #region Predictive Analytics
+        
+        private void UpdatePredictiveAnalytics()
+        {
+            if (predictiveEngine == null || interactionHistory.Count < 10) return;
+            
+            // Predict future player behavior
+            var predictions = predictiveEngine.PredictPlayerBehavior(interactionHistory.ToArray(), personality);
+            
+            foreach (var prediction in predictions)
+            {
+                if (prediction.confidence > 0.7f)
+                {
+                    PrepareForPredictedBehavior(prediction);
+                }
+            }
+        }
+        
+        private void PrepareForPredictedBehavior(BehaviorPrediction prediction)
+        {
+            switch (prediction.predictedBehavior)
+            {
+                case "player_approach":
+                    if (personality.friendliness > 0.6f)
+                    {
+                        // Prepare friendly interaction
+                        behaviorWeights["interact"] *= 1.2f;
+                    }
+                    break;
+                    
+                case "player_avoid":
+                    // Reduce interaction attempts
+                    behaviorWeights["follow"] *= 0.8f;
+                    behaviorWeights["interact"] *= 0.7f;
+                    break;
+                    
+                case "player_explore":
+                    // Increase patrol and investigation
+                    behaviorWeights["patrol"] *= 1.1f;
+                    behaviorWeights["investigate"] *= 1.2f;
+                    break;
+            }
+            
+            NormalizeBehaviorWeights();
+        }
+        
+        #endregion
+        
+        private void NormalizeBehaviorWeights()
+        {
+            float sum = behaviorWeights.Values.Sum();
+            if (sum > 0)
+            {
+                var keys = behaviorWeights.Keys.ToArray();
+                foreach (var key in keys)
+                {
+                    behaviorWeights[key] /= sum;
+                }
+            }
+        }
 
         /// <summary>
         /// Get current NPC state for external systems
@@ -744,21 +1358,92 @@ namespace NeonQuest.AI
             personality = newPersonality;
             LogDebug($"NPC personality manually set to {personality.type}");
         }
+        
+        /// <summary>
+        /// Get current emotional state
+        /// </summary>
+        public EmotionalState GetEmotionalState()
+        {
+            return currentEmotionalState;
+        }
+        
+        /// <summary>
+        /// Get emotional intensity (0-1)
+        /// </summary>
+        public float GetEmotionalIntensity()
+        {
+            return emotionalIntensity;
+        }
+        
+        /// <summary>
+        /// Get swarm behavior data
+        /// </summary>
+        public SwarmBehaviorData GetSwarmData()
+        {
+            return swarmData;
+        }
+        
+        /// <summary>
+        /// Force emotional state change (for testing)
+        /// </summary>
+        public void SetEmotionalState(EmotionalState newState, float intensity = 0.7f)
+        {
+            currentEmotionalState = newState;
+            emotionalIntensity = Mathf.Clamp01(intensity);
+            LogDebug($"NPC emotional state set to {newState} with intensity {intensity:F2}");
+        }
+        
+        /// <summary>
+        /// Get comprehensive NPC status for debugging
+        /// </summary>
+        public NPCStatus GetNPCStatus()
+        {
+            return new NPCStatus
+            {
+                currentState = currentState,
+                personality = personality,
+                emotionalState = currentEmotionalState,
+                emotionalIntensity = emotionalIntensity,
+                swarmSize = nearbyNPCs?.Count ?? 0,
+                interactionCount = interactionHistory.Count,
+                learningEnabled = enableRealTimeLearning,
+                emotionalIntelligenceEnabled = enableEmotionalIntelligence,
+                swarmIntelligenceEnabled = enableSwarmIntelligence,
+                quantumDecisionMakingEnabled = enableQuantumDecisionMaking
+            };
+        }
 
         protected override void OnCleanup()
         {
+            // Stop all coroutines
             if (learningCoroutine != null)
             {
                 StopCoroutine(learningCoroutine);
                 learningCoroutine = null;
+            }
+            
+            if (emotionalUpdateCoroutine != null)
+            {
+                StopCoroutine(emotionalUpdateCoroutine);
+                emotionalUpdateCoroutine = null;
+            }
+            
+            if (swarmUpdateCoroutine != null)
+            {
+                StopCoroutine(swarmUpdateCoroutine);
+                swarmUpdateCoroutine = null;
             }
 
             // Clean up neural network resources
             neuralNetwork?.Dispose();
             memorySystem?.Dispose();
             interactionAnalyzer?.Dispose();
+            emotionalEngine?.Dispose();
+            swarmCore?.Dispose();
+            quantumProcessor?.Dispose();
+            predictiveEngine?.Dispose();
 
-            LogDebug("Neural NPC Behavior System cleaned up");
+            LogDebug("Enhanced Neural NPC Behavior System cleaned up");
         }
     }
 

@@ -15,13 +15,17 @@ namespace NeonQuest.Effects
     /// </summary>
     public class QuantumLightingEngine : NeonQuestComponent
     {
-        [Header("Quantum Lighting Configuration")]
+        [Header("🌌 Quantum Lighting Configuration")]
         [SerializeField] private int maxQuantumParticles = 1000;
         [SerializeField] private float quantumCoherenceRadius = 10f;
         [SerializeField] private float entanglementStrength = 0.8f;
         [SerializeField] private float superpositionIntensity = 0.6f;
         [SerializeField] private bool enableQuantumTunneling = true;
         [SerializeField] private bool enableWaveParticleInterference = true;
+        [SerializeField] private bool enableHolographicProjections = true;
+        [SerializeField] private bool enableDimensionalRifts = true;
+        [SerializeField] private bool enableConsciousnessResonance = true;
+        [SerializeField] private bool enableTemporalLightDistortion = false;
 
         [Header("Lighting Effects")]
         [SerializeField] private Light[] quantumLights;
@@ -46,16 +50,26 @@ namespace NeonQuest.Effects
         private QuantumField quantumField;
         private WaveFunction lightWaveFunction;
         private EntanglementNetwork entanglementNetwork;
+        private HolographicProjector[] holographicProjectors;
+        private DimensionalRift[] dimensionalRifts;
+        private ConsciousnessResonanceField consciousnessField;
+        private TemporalLightDistorter temporalDistorter;
         
         // Rendering and Effects
         private ComputeShader quantumComputeShader;
         private RenderTexture quantumFieldTexture;
+        private RenderTexture holographicTexture;
+        private RenderTexture dimensionalRiftTexture;
         private MaterialPropertyBlock quantumPropertyBlock;
         private Coroutine quantumUpdateCoroutine;
+        private Coroutine holographicUpdateCoroutine;
+        private Coroutine dimensionalUpdateCoroutine;
         
         // Performance Optimization
         private Camera mainCamera;
         private float lastQuantumUpdate;
+        private float consciousnessResonanceLevel = 0.5f;
+        private float dimensionalStability = 1.0f;
         private const float QUANTUM_UPDATE_INTERVAL = 0.016f; // 60 FPS
 
         [System.Serializable]
@@ -105,6 +119,57 @@ namespace NeonQuest.Effects
             public float entanglementStrength;
             public float correlationPhase;
             public Vector3 sharedQuantumState;
+        }
+        
+        [System.Serializable]
+        public class HolographicProjector
+        {
+            public Vector3 position;
+            public Vector3 projectionDirection;
+            public Color hologramColor;
+            public float intensity;
+            public float coherenceLength;
+            public Texture2D hologramPattern;
+            public bool isActive;
+            public float interferencePhase;
+            public Vector3[] interferencePoints;
+        }
+        
+        [System.Serializable]
+        public class DimensionalRift
+        {
+            public Vector3 riftCenter;
+            public Vector3 riftNormal;
+            public float riftRadius;
+            public float stabilityIndex;
+            public Color riftEnergyColor;
+            public float energyFlux;
+            public bool isStable;
+            public float dimensionalFrequency;
+            public Vector3 parallelDimensionOffset;
+        }
+        
+        [System.Serializable]
+        public class ConsciousnessResonanceField
+        {
+            public Vector3 fieldCenter;
+            public float resonanceRadius;
+            public float consciousnessLevel;
+            public Color resonanceColor;
+            public float empathicStrength;
+            public float[] brainwaveFrequencies;
+            public bool isResonating;
+        }
+        
+        [System.Serializable]
+        public class TemporalLightDistorter
+        {
+            public Vector3 distortionCenter;
+            public float timeDialationFactor;
+            public float lightSpeedModifier;
+            public Color temporalAura;
+            public bool isActive;
+            public float chronotonDensity;
         }
 
         protected override void OnInitialize()
