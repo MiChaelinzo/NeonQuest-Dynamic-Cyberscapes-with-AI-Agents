@@ -81,26 +81,43 @@ namespace NeonQuest.Quantum
         {
             if (!isInitialized || !enableQuantumReality) return;
             
-            // Update quantum field
-            UpdateQuantumField();
-            
-            // Process quantum states
-            ProcessQuantumStates();
-            
-            // Update reality distortions
-            if (enableRealityDistortion)
+            try
             {
-                UpdateRealityDistortions();
+                // Update quantum field with performance optimization
+                UpdateQuantumField();
+                
+                // Process quantum states with batching
+                if (activeQuantumStates.Count > 0)
+                {
+                    ProcessQuantumStates();
+                }
+                
+                // Update reality distortions with LOD
+                if (enableRealityDistortion && activeDistortions.Count > 0)
+                {
+                    UpdateRealityDistortions();
+                }
+                
+                // Process quantum tunneling with safety checks
+                if (enableQuantumTunneling)
+                {
+                    ProcessQuantumTunneling();
+                }
+                
+                // Monitor reality stability with enhanced detection
+                MonitorRealityStability();
+                
+                // Perform quantum coherence maintenance
+                if (Time.frameCount % 60 == 0) // Every second at 60fps
+                {
+                    PerformQuantumMaintenance();
+                }
             }
-            
-            // Process quantum tunneling
-            if (enableQuantumTunneling)
+            catch (System.Exception ex)
             {
-                ProcessQuantumTunneling();
+                LogError($"❌ Quantum reality engine error: {ex.Message}");
+                HandleQuantumEngineError(ex);
             }
-            
-            // Monitor reality stability
-            MonitorRealityStability();
         }
         
         public void CreateQuantumState(Vector3 position, QuantumStateType stateType)

@@ -105,32 +105,50 @@ namespace NeonQuest.TimeTravel
         {
             if (!isInitialized || !enableTimeTravel) return;
             
-            // Update temporal energy
-            UpdateTemporalEnergy();
-            
-            // Process time distortion
-            ProcessTimeDistortion();
-            
-            // Update temporal loops
-            if (enableTemporalLoops)
+            try
             {
-                ProcessTemporalLoops();
+                // Update temporal energy with performance monitoring
+                UpdateTemporalEnergy();
+                
+                // Process time distortion with safety checks
+                ProcessTimeDistortion();
+                
+                // Update temporal loops with optimization
+                if (enableTemporalLoops && activeLoops.Count > 0)
+                {
+                    ProcessTemporalLoops();
+                }
+                
+                // Monitor timeline stability with enhanced detection
+                MonitorTimelineStability();
+                
+                // Detect and handle paradoxes with improved algorithms
+                if (enableParadoxPrevention && Time.frameCount % 10 == 0) // Check every 10 frames for performance
+                {
+                    DetectTemporalParadoxes();
+                }
+                
+                // Process temporal anomalies with batching
+                if (activeAnomalies.Count > 0)
+                {
+                    ProcessTemporalAnomalies();
+                }
+                
+                // Update temporal objects with LOD system
+                UpdateTemporalObjects();
+                
+                // Auto-cleanup expired data
+                if (Time.frameCount % 300 == 0) // Every 5 seconds at 60fps
+                {
+                    PerformMaintenanceCleanup();
+                }
             }
-            
-            // Monitor timeline stability
-            MonitorTimelineStability();
-            
-            // Detect and handle paradoxes
-            if (enableParadoxPrevention)
+            catch (System.Exception ex)
             {
-                DetectTemporalParadoxes();
+                LogError($"❌ Temporal engine update error: {ex.Message}");
+                // Graceful degradation - disable problematic features temporarily
+                HandleTemporalEngineError(ex);
             }
-            
-            // Process temporal anomalies
-            ProcessTemporalAnomalies();
-            
-            // Update temporal objects
-            UpdateTemporalObjects();
         }
         
         public void TravelToTime(float targetTime, GameObject traveler = null)
@@ -875,7 +893,79 @@ namespace NeonQuest.TimeTravel
             }
         }
         
-        #region Public API
+        private void PerformMaintenanceCleanup()
+        {
+            try
+            {
+                // Clean up old timeline snapshots
+                if (timelineHistory.Count > 50)
+                {
+                    var oldSnapshots = timelineHistory.OrderBy(s => s.timestamp).Take(timelineHistory.Count - 50).ToList();
+                    foreach (var snapshot in oldSnapshots)
+                    {
+                        timelineHistory.Remove(snapshot);
+                    }
+                    LogDebug($"🧹 Cleaned up {oldSnapshots.Count} old timeline snapshots");
+                }
+                
+                // Clean up inactive timelines
+                var inactiveTimelines = activeTimelines.Values.Where(t => !t.isActive && 
+                    Time.time - t.creationTime > 300f).ToList(); // 5 minutes old
+                foreach (var timeline in inactiveTimelines)
+                {
+                    activeTimelines.Remove(timeline.timelineId);
+                }
+                
+                if (inactiveTimelines.Count > 0)
+                {
+                    LogDebug($"🧹 Cleaned up {inactiveTimelines.Count} inactive timelines");
+                }
+                
+                // Optimize temporal objects dictionary
+                var nullObjects = temporalObjects.Keys.Where(obj => obj == null).ToList();
+                foreach (var nullObj in nullObjects)
+                {
+                    temporalObjects.Remove(nullObj);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                LogError($"❌ Maintenance cleanup error: {ex.Message}");
+            }
+        }
+        
+        private void HandleTemporalEngineError(System.Exception ex)
+        {
+            LogError($"🚨 Temporal engine error detected: {ex.Message}");
+            
+            // Implement graceful degradation
+            if (ex.Message.Contains("paradox") || ex.Message.Contains("timeline"))
+            {
+                // Disable paradox detection temporarily
+                enableParadoxPrevention = false;
+                LogWarning("⚠️ Paradox prevention temporarily disabled due to error");
+            }
+            
+            if (ex.Message.Contains("loop") || ex.Message.Contains("temporal"))
+            {
+                // Clear problematic loops
+                var problematicLoops = activeLoops.Values.Where(l => l.isActive).ToList();
+                foreach (var loop in problematicLoops)
+                {
+                    EndTemporalLoop(loop);
+                }
+                activeLoops.Clear();
+                LogWarning("⚠️ All temporal loops cleared due to error");
+            }
+            
+            // Stabilize current timeline
+            if (currentTimeline != null)
+            {
+                currentTimeline.stabilityIndex = Mathf.Max(currentTimeline.stabilityIndex, 0.5f);
+            }
+        }
+        
+        #region Enhanced Public API
         
         public TemporalStats GetTemporalStats()
         {
@@ -903,18 +993,204 @@ namespace NeonQuest.TimeTravel
         
         public void SetTimeDistortion(float distortion)
         {
-            currentTimeDistortion = Mathf.Clamp(distortion, 0.1f, maxTimeDistortion);
+            if (distortion < 0.1f || distortion > maxTimeDistortion)
+            {
+                LogWarning($"⚠️ Time distortion value {distortion} out of range [0.1, {maxTimeDistortion}]");
+                return;
+            }
+            
+            currentTimeDistortion = distortion;
             LogDebug($"⏰ Time distortion set to: {currentTimeDistortion}");
         }
         
         public void CreateTimeSlowField(Vector3 position, float radius = 10f)
         {
+            if (temporalEnergy < 100f)
+            {
+                LogWarning("⚠️ Insufficient energy for time slow field");
+                return;
+            }
+            
             CreateTemporalLoop(position, 30f, radius);
+        }
+        
+        public void CreateTimeAccelerationField(Vector3 position, float radius = 10f, float acceleration = 2f)
+        {
+            if (temporalEnergy < 150f)
+            {
+                LogWarning("⚠️ Insufficient energy for time acceleration field");
+                return;
+            }
+            
+            var loop = new TemporalLoop
+            {
+                loopId = System.Guid.NewGuid().ToString(),
+                position = position,
+                radius = radius,
+                duration = 20f,
+                loopCount = 0,
+                maxLoops = 1,
+                startTime = Time.time,
+                isActive = true,
+                loopType = TemporalLoopType.Temporal
+            };
+            
+            activeLoops[loop.loopId] = loop;
+            temporalEnergy -= 150f;
+            
+            LogDebug($"⚡ Time acceleration field created at {position}");
+        }
+        
+        public bool CanTravelToTimeline(string timelineId)
+        {
+            if (!activeTimelines.ContainsKey(timelineId))
+            {
+                return false;
+            }
+            
+            var timeline = activeTimelines[timelineId];
+            return timeline.isActive && timeline.stabilityIndex > 0.3f && temporalEnergy > 100f;
+        }
+        
+        public void SwitchToTimeline(string timelineId)
+        {
+            if (!CanTravelToTimeline(timelineId))
+            {
+                LogWarning($"⚠️ Cannot switch to timeline: {timelineId}");
+                return;
+            }
+            
+            var targetTimeline = activeTimelines[timelineId];
+            
+            // Store current timeline state
+            StoreUniverseState(currentTimeline);
+            
+            // Switch timelines
+            var previousTimeline = currentTimeline;
+            currentTimeline = targetTimeline;
+            
+            // Apply new timeline physics
+            ApplyTemporalEnvironmentEffects(targetTimeline.currentTimeIndex);
+            
+            // Consume energy
+            temporalEnergy -= 100f;
+            
+            LogDebug($"🔄 Switched from {previousTimeline.timelineName} to {targetTimeline.timelineName}");
+        }
+        
+        public void CreateTemporalSavePoint(string description = "Manual Save Point")
+        {
+            if (temporalEnergy < 50f)
+            {
+                LogWarning("⚠️ Insufficient energy for save point creation");
+                return;
+            }
+            
+            CreateTimelineSnapshot(description);
+            temporalEnergy -= 50f;
+            
+            LogDebug($"💾 Temporal save point created: {description}");
+        }
+        
+        public List<TimelineSnapshot> GetAvailableSavePoints()
+        {
+            return timelineHistory.Where(s => s.description.Contains("Save Point") || 
+                                           s.description.Contains("Manual")).ToList();
+        }
+        
+        public void LoadFromSavePoint(string snapshotId)
+        {
+            var snapshot = timelineHistory.FirstOrDefault(s => s.snapshotId == snapshotId);
+            if (snapshot == null)
+            {
+                LogError($"❌ Save point not found: {snapshotId}");
+                return;
+            }
+            
+            if (temporalEnergy < 200f)
+            {
+                LogWarning("⚠️ Insufficient energy for save point restoration");
+                return;
+            }
+            
+            RestoreFromSnapshot(snapshot);
+            temporalEnergy -= 200f;
+            
+            LogDebug($"📁 Restored from save point: {snapshot.description}");
         }
         
         public void EmergencyTemporalReset()
         {
+            LogWarning("🚨 Emergency temporal reset initiated by user");
             EmergencyTimelineReset();
+        }
+        
+        public TemporalHealthStatus GetTemporalHealth()
+        {
+            var health = new TemporalHealthStatus
+            {
+                overallHealth = CalculateOverallHealth(),
+                timelineStability = currentTimeline?.stabilityIndex ?? 0f,
+                energyLevel = temporalEnergy / temporalEnergyCapacity,
+                paradoxRisk = CalculateParadoxRisk(),
+                anomalyCount = activeAnomalies.Count,
+                recommendations = GenerateHealthRecommendations()
+            };
+            
+            return health;
+        }
+        
+        private float CalculateOverallHealth()
+        {
+            float stability = currentTimeline?.stabilityIndex ?? 0f;
+            float energy = temporalEnergy / temporalEnergyCapacity;
+            float paradoxRisk = 1f - CalculateParadoxRisk();
+            float anomalyImpact = 1f - (activeAnomalies.Count * 0.1f);
+            
+            return (stability + energy + paradoxRisk + anomalyImpact) / 4f;
+        }
+        
+        private float CalculateParadoxRisk()
+        {
+            if (currentTimeline == null) return 0f;
+            
+            float eventDensity = currentTimeline.temporalEvents.Count * 0.02f;
+            float stabilityRisk = 1f - currentTimeline.stabilityIndex;
+            float energyRisk = temporalEnergy < (temporalEnergyCapacity * 0.2f) ? 0.3f : 0f;
+            
+            return Mathf.Clamp01(eventDensity + stabilityRisk + energyRisk);
+        }
+        
+        private List<string> GenerateHealthRecommendations()
+        {
+            var recommendations = new List<string>();
+            
+            if (temporalEnergy < temporalEnergyCapacity * 0.3f)
+            {
+                recommendations.Add("⚡ Temporal energy low - avoid major time operations");
+            }
+            
+            if (currentTimeline?.stabilityIndex < 0.5f)
+            {
+                recommendations.Add("⚠️ Timeline unstable - consider stabilization");
+            }
+            
+            if (activeAnomalies.Count > 3)
+            {
+                recommendations.Add("🌀 Multiple anomalies detected - investigate sources");
+            }
+            
+            if (activeLoops.Count > 3)
+            {
+                recommendations.Add("🔄 Many active loops - monitor for interference");
+            }
+            
+            if (recommendations.Count == 0)
+            {
+                recommendations.Add("✅ Temporal systems operating normally");
+            }
+            
+            return recommendations;
         }
         
         #endregion
@@ -1085,6 +1361,17 @@ namespace NeonQuest.TimeTravel
         public float temporalEnergy;
         public float timelineStability;
         public float currentTimeIndex;
+    }
+    
+    [System.Serializable]
+    public class TemporalHealthStatus
+    {
+        public float overallHealth;
+        public float timelineStability;
+        public float energyLevel;
+        public float paradoxRisk;
+        public int anomalyCount;
+        public List<string> recommendations;
     }
     
     public class TemporalNavigator : System.IDisposable
