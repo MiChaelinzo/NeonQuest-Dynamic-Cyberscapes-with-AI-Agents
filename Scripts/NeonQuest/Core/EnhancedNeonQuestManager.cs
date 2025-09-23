@@ -38,6 +38,14 @@ namespace NeonQuest.Core
         [SerializeField] private bool enableSmartResourceAllocation = true;
         [SerializeField] private float aiUpdateFrequency = 1f;
         
+        [Header("🌟 Apex Technology Integration")]
+        [SerializeField] private bool enableApexTechnologyIntegration = true;
+        [SerializeField] private bool enableHyperspaceNavigation = true;
+        [SerializeField] private bool enableCosmicEnergyHarvesting = true;
+        [SerializeField] private bool enablePsychicResonance = true;
+        [SerializeField] private bool enableNanotechnologySwarm = true;
+        [SerializeField] private bool enableHolographicReality = true;
+        
         // Enhanced Core Systems
         private EnhancedConfigurationManager enhancedConfigManager;
         private AdvancedDiagnosticsManager advancedDiagnostics;
@@ -45,6 +53,14 @@ namespace NeonQuest.Core
         private PredictiveAnalyticsEngine analyticsEngine;
         private SmartResourceManager resourceManager;
         private QuantumPerformanceBooster quantumBooster;
+        
+        // Apex Technology Systems
+        private NeonQuest.Apex.ApexTechnologyIntegrator apexIntegrator;
+        private NeonQuest.Hyperspace.HyperspaceNavigationCore hyperspaceCore;
+        private NeonQuest.Cosmic.CosmicEnergyHarvester cosmicHarvester;
+        private NeonQuest.Psychic.PsychicResonanceNetwork psychicNetwork;
+        private NeonQuest.Nano.NanotechnologySwarmCore nanoSwarm;
+        private NeonQuest.Holographic.HolographicRealityEngine holographicEngine;
         
         // System Health Monitoring
         private SystemHealthMonitor healthMonitor;
