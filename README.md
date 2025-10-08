@@ -37,7 +37,7 @@ NeonQuest transforms static cyberpunk environments into living, breathing worlds
 ### Prerequisites
 
 - Unity 2022.3 LTS or newer
-- [Neon Underground Asset Pack](https://assetstore.unity.com/packages/3d/environments/neon-underground-213547) (recommended)
+- [Neon Underground Asset Pack]([https://assetstore.unity.com/packages/3d/environments/neon-underground-213547](https://assetstore.unity.com/packages/3d/environments/sci-fi/scifi-neon-underground-296561)) (recommended)
 - Kiro IDE (optional, for AI agent features)
 
 ### Installation
